@@ -1,0 +1,7 @@
+apiVersion: chorgi.io/v1
+kind: PingServerResource
+metadata:
+  name: ping-server-instance
+  namespace: pp
+spec:
+  replicas: 6

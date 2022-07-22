@@ -1,0 +1,17 @@
+micronaut:
+  application:
+    name: pingpong
+  config-client:
+    enabled: true
+kubernetes:
+  client:
+    discovery:
+      mode: endpoint
+      mode-configuration:
+        endpoint:
+          watch:
+            enabled: true
+endpoints:
+  health:
+    enabled: true
+    details-visible: ANONYMOUS

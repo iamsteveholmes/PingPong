@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.example
+testFramework: kotest
+sourceLanguage: kotlin
+buildTool: gradle_kotlin
+features: [ annotation-api, app-name, config-kubernetes, discovery-kubernetes, gradle, http-client, jackson-databind, jib, kotest, kotlin, kotlin-application, kotlin-build, kotlin-extension-functions, kubernetes, kubernetes-informer, kubernetes-reactor-client, logback, management, micronaut-build, netty-server, readme, shade, yaml ]

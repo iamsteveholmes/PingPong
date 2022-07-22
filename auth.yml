@@ -1,0 +1,141 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pp
+  labels:
+    name: pingpong
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ping-pong-sa
+  namespace: pp
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: service-discoverer
+#  namespace: pp
+rules:
+  - apiGroups:
+    - ""
+    - batch
+    - apps
+    resources:
+      - services
+      - endpoints
+      - configmaps
+      - secrets
+      - pods
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - patch
+      - update
+  - nonResourceURLs:
+    - /health
+    - /ping
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: default-service-discoverer
+  namespace: pp
+subjects:
+  - kind: Group
+    name: system:serviceaccounts:pp
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: service-discoverer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crd-operator
+  namespace: pp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: crd-operator-view
+  namespace: pp
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: crd-operator
+    namespace: pp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pingserverreconciler-role-binding
+  namespace: pp
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: pingserverreconciler-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: crd-operator
+    namespace: pp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: josdk-crd-validating-cluster-role
+  namespace: pp
+rules:
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pingserverreconciler-cluster-role
+  namespace: pp
+rules:
+  - apiGroups:
+      - chorgi.io
+    resources:
+      - pingserverresources
+      - pingserverresources/status
+      - pingserverresources/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - patch
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pingserverreconciler-crd-validating-role-binding
+  namespace: pp
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: josdk-crd-validating-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: crd-operator
+    namespace: pp
